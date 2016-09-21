@@ -2,7 +2,7 @@ const optionList = ["filter"];
 const MESSAGE_AUTO_LOOKUP = "AUTO_LOOKUP";
 
 let currentUrl = null; // 当前tab的url
-let oldOptions = {};   // storage中现有的option
+let currentOptions = {};   // storage中现有的option
 let windowId = null;
 
 main();
@@ -25,15 +25,12 @@ function main() {
   });
   $("#form-option").on("change", function () {
     const formData = getFormObj(this);
+    console.log(formData);
     sendMessage({
       type: MESSAGE_AUTO_LOOKUP,
       data: Boolean(formData.filter)
     });
-    storeOption(formData, oldOptions, currentUrl);
-  });
-  chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    if (message && message.type === "")
-    console.log(message);
+    storeOption(formData, currentOptions, currentUrl);
   });
 }
 
@@ -60,6 +57,8 @@ function storeOption(formData, oldOption, currentUrl) {
   } else if (!formData.filter && index !== -1) {
     nextFilter = filter.slice(0, index).concat(filter.slice(index + 1));
   }
+  // update current option
+  currentOptions.filter = nextFilter;
   chrome.storage.sync.set({ filter: nextFilter});
 }
 
@@ -70,14 +69,14 @@ function restoreOption() {
       getCurrentTabUrl(sWin.id).then(url => {
         currentUrl = url;
         chrome.storage.sync.get(["filter", "lastWord"], function (items) {
-          oldOptions = items;
+          currentOptions = items;
           // restore filter option
-          const filter = oldOptions.filter || [];
+          const filter = currentOptions.filter || [];
           if (filter.indexOf(currentUrl) !== -1) {
             $("[name=filter]").attr("checked", true);
           }
-          if (oldOptions.lastWord) {
-            $("#word").val(oldOptions.lastWord);
+          if (currentOptions.lastWord) {
+            $("#word").val(currentOptions.lastWord);
           }
         });
       });

@@ -8,6 +8,7 @@ const POPUP_CLOSE_ID = "youdao-popup-close";
 const POPUP = "youdao-popup";
 const POPUP_HEADER = "youdao-popup-header";
 const POPUP_TITLE = "youdao-popup-title";
+const WIDTH = 300; // popup content width
 
 let selectionStart = false;
 let enableAutoTranslate = false; // 是否启用划词翻译
@@ -19,27 +20,27 @@ function main() {
     renderContentWrapper();
     if (items.filter && items.filter.indexOf(window.location.href) !== -1) {
       enableAutoTranslate = true;
-      document.body.addEventListener("mousedown", function () {
-        selectionStart = true;
-      });
-
-      document.body.addEventListener("mouseup", function () {
-        if (selectionStart) {
-          const selection = window.getSelection();
-          const word = selection.toString();
-          findPosition(selection, word);
-          chrome.storage.sync.set({"lastWord": word});
-          if (enableAutoTranslate) {
-            lookup(word);
-          }
-          // 隐藏
-          if (!word || !enableAutoTranslate) {
-            document.getElementById(POPUP).style.display = "none";
-          }
-        }
-        selectionStart = false;
-      });
     }
+    document.body.addEventListener("mousedown", function () {
+      selectionStart = true;
+    });
+    document.body.addEventListener("mouseup", function () {
+      if (selectionStart) {
+        const selection = window.getSelection();
+        const word = selection.toString();
+        const isNormalWord = isNormal(word);
+        chrome.storage.sync.set({ "lastWord": word });
+        if (enableAutoTranslate && isNormalWord) {
+          findPosition(selection, word);
+          lookup(word);
+        }
+        // 隐藏
+        if (!isNormalWord || !enableAutoTranslate) {
+          document.getElementById(POPUP).style.display = "none";
+        }
+      }
+      selectionStart = false;
+    });
   });
   chrome.runtime.onMessage.addListener(function (response, sender, sendResponse) {
     if (response && response.type === MESSAGE_AUTO_LOOKUP) {
@@ -47,7 +48,6 @@ function main() {
     }
   });
 }
-
 
 function sendMessage(message) {
   chrome.runtime.sendMessage(message, function (response) {
@@ -65,7 +65,7 @@ function translateXML(xmlNode) {
     webTitle: "网络释义",
     emptyTemplate: emptyTemplate
   };
-  const baseTrans = translateBaseInterpretation(translationList); 
+  const baseTrans = translateBaseInterpretation(translationList);
   const webTrans = translateWebInterpretation(webTranslationList);
   const baseEmpty = isEmpty(baseTrans);
   const webEmpty = isEmpty(webTrans);
@@ -85,7 +85,7 @@ function translateXML(xmlNode) {
 // 基本释义的解析
 function translateBaseInterpretation(translationList) {
   const ret = [];
-  for(let i = 0, len = translationList.length; i < len; i++) {
+  for (let i = 0, len = translationList.length; i < len; i++) {
     const translation = translationList[i];
     const interpretation = translation.getElementsByTagName("content")[0].childNodes[0].nodeValue;
     ret.push(interpretation);
@@ -96,12 +96,12 @@ function translateBaseInterpretation(translationList) {
 // 网络释义的解析
 function translateWebInterpretation(nodeList) {
   let ret = [];
-  for(let i = 0, len = nodeList.length; i < len; i++) {
+  for (let i = 0, len = nodeList.length; i < len; i++) {
     const node = nodeList[i];
     const key = node.getElementsByTagName("key")[0].childNodes[0].nodeValue;
     let trans = [];
     const transList = node.getElementsByTagName("trans");
-    for(let j = 0, l = transList.length; j < l; j++) {
+    for (let j = 0, l = transList.length; j < l; j++) {
       const transNode = transList[j];
       const value = transNode.getElementsByTagName("value")[0].childNodes[0].nodeValue;
       trans.push(value);
@@ -186,31 +186,24 @@ function get_text_width(txt, font) {
   context.font = font;
   return context.measureText(txt).width;
 }
-// should find document position rather than fixed position
-function findPosition(selection, word="") {
+
+// consider body scroll
+function findPosition(selection, word = "") {
   const rangeRect = selection.getRangeAt(0).getBoundingClientRect();
   const anchorNode = selection.anchorNode;
   const parentElement = anchorNode.parentElement;
-  const [_, offsetTop] = findOffsetAgainstBody(parentElement);
-  findOffsetAgainstBody(parentElement);
+  const scrollTop = document.body.scrollTop;
+  const scrollLeft = document.body.scrollLeft;
   const computedStyle = window.getComputedStyle(parentElement);
   const container = document.getElementById(POPUP);
   const txtWidth = get_text_width("a", computedStyle.font);
-  container.style.top = `${offsetTop + parseInt(computedStyle.lineHeight) }px`;
+  container.style.top = `${scrollTop + rangeRect.top + parseInt(computedStyle.lineHeight)}px`;
   // left 仍然以屏幕为基准取位置
-  container.style.left = `${rangeRect.left + word.length * txtWidth}px`;
-  // TODO 是否超出屏幕检测
-}
-
-function findOffsetAgainstBody(element) {
-  let offsetTop = 0, offsetLeft = 0;
-  while(element && element.tagName !== "BODY") {
-    offsetTop += element.offsetTop;
-    offsetLeft += element.offsetLeft;
-    element = element.offsetParent;
+  let left = scrollLeft + rangeRect.left + word.length * txtWidth;
+  if (left + WIDTH + 10 > document.body.offsetWidth) {
+    left = document.body.offsetWidth - 10 - WIDTH;
   }
-  console.log(offsetTop);
-  return [offsetLeft, offsetTop];
+  container.style.left = `${left}px`;
 }
 
 function contentTpl(res/* look up result */) {
@@ -218,9 +211,14 @@ function contentTpl(res/* look up result */) {
     return res.emptyTemplate;
   }
   return `
-    <h5>${res.baseTitle}:</h5>
+    <h5 class="category-title">${res.baseTitle}:</h5>
     <div>${res.baseTemplate}</div>
-    <h5>${res.webTitle}:</h5>
+    <h5 class="category-title">${res.webTitle}:</h5>
     <div>${res.webTemplate}</div>
   `;
+}
+
+function isNormal(word) {
+  const blackList = String.fromCharCode(10/* enter */, 32/* 空格 */, 9/* tab */);
+  return blackList.indexOf(word) === -1 ? !!word : false;
 }
