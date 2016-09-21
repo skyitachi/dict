@@ -1,0 +1,39 @@
+#youdao-popup {
+  position: absolute;
+  display: none;
+  z-index: 100;
+  max-width: 400px;
+  top: 100px;
+  left: 100px;
+  background: #fff;
+  border-radius: 3px;
+  border: 1px solid #eee;
+  box-shadow: 5px 5px 5px 0 rgba(0, 0, 0, 0.1)
+}
+#youdao-popup-header {
+  overflow: auto;
+  zoom: 1;
+  color: #fff;
+  height: 28px;
+  line-height: 28px;
+  background: #1E88E5;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+#youdao-popup-title {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #fff;
+}
+
+#youdao-popup-close {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  cursor: pointer;
+  color: #fff;
+}
+#youdao-popup-content {
+  padding: 10px;
+}

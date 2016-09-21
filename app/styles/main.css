@@ -1,0 +1,40 @@
+body {
+  padding: 10px;
+  width: 260px;
+}
+
+#lookup {
+  margin-left: 10px;
+  padding: 0 15px;
+}
+
+.mui-form--inline >.mui-textfield {
+  display:inline-block;
+  margin-bottom: 0
+}
+
+.mui-form--inline >.mui-checkbox,.mui-form--inline>.mui-radio {
+  display: inline-block;
+  margin-top: 0;
+  margin-bottom: 0;
+  vertical-align: middle
+}
+
+.mui-form--inline>.mui-checkbox>label,.mui-form--inline>.mui-radio>label {
+  padding-left: 0
+}
+
+.mui-form--inline>.mui-checkbox>label>input[type=checkbox],.mui-form--inline>.mui-radio>label>input[type=radio] {
+  position: relative;
+  margin-left: 0
+}
+
+.mui-form--inline>.mui-select {
+  display: inline-block
+}
+
+.mui-form--inline>.mui-btn {
+  margin-bottom: 0;
+  margin-top: 0;
+  vertical-align: bottom
+}

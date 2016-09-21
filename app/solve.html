@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>solve quora</title>
+  <style>
+    #container, #container1 {
+      border: 1px solid red;
+    }
+  </style>
+</head>
+<body>
+  <input id="input" type="text" placeholder="请输入大小" value="2">
+  x:<input id="xpos" placeholder="请输入x" value="0">
+  y:<input id="ypos" placeholder="请输入y" value="0">
+  <button id="generate">生成</button>
+  <button id="solve">解决</button>
+  <canvas id="container" width="600" height="600"></canvas>
+  <canvas id="container1" width="600" height="600"></canvas>
+  <script>
+    var canvas = document.getElementById("container");
+    var input = document.getElementById("input");
+    var xInput = document.getElementById("xpos");
+    var yInput = document.getElementById("ypos");
+    var generateBtn = document.getElementById("generate");
+    var solveBtn = document.getElementById("solve");
+    var ctx =  canvas.getContext("2d");
+    var xPos = +xInput.value,  yPos = +yInput.value;
+    var count = 0;
+    function drawBoard(size, xPos, yPos) {
+      console.log(xPos, yPos);
+      var startX = 10.5, startY = 10.5;
+      var width = 20, height = 20;
+      size = +size > 2 ? +size : 2;
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 1;
+      for(var i = 0; i < size; i++) {
+        for(var j = 0; j < size; j++) {
+          ctx.strokeRect(startX + i * width, startY + j * width, width, height);
+        }
+      }
+      ctx.fillStyle = "black";
+      ctx.fillRect(startX + xPos * width, startY + yPos * width, width, height);
+    }
+    function solve(startX, startY, x, y, size, solution) {
+      var cons = [];
+      count++;
+      if (size < 4) {
+        for(var i = 0; i < size; i++) {
+          for(var j = 0; j < size; j++) {
+            if ((i + startX) !== x || (j + startY )!== y) {
+              cons.push({x: startX + i , y: j + startY });
+            }
+          }
+        }
+        solution.push(cons);
+        return solution;
+      }
+      let x1 = size / 2 - 1 + startX, y1 = size / 2 - 1 + startY;
+      let x2 = x1 + 1, y2 = y1;
+      let x3 = x1, y3 = y1 + 1;
+      let x4 = x1 + 1, y4 = y1 + 1;
+      cons = [
+        { x: x1, y: y1 },
+        { x: x2, y: y2 },
+        { x: x3, y: y3 },
+        { x: x4, y: y4 }
+      ];
+      if (x === x1 && y === y1) {
+        cons = cons.slice(1);
+        solution.push(cons);
+        solution = solve(startX, startY, x1, y1, size / 2, solution);
+        solution = solve(x2, startY, x2, y2, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x3, y3, size / 2, solution);
+        solution = solve(startX + size / 2, startY + size / 2, x4, y4, size / 2, solution);
+      } else if (x === x2 && y === y2) {
+        cons = cons.slice(0, 1).concat(cons.slice(2));
+        solution.push(cons);
+        solution = solve(startX, startY, x1, y1, size / 2, solution);
+        solution = solve(x2, startY, x2, y2, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x3, y3, size / 2, solution);
+        solution = solve(startX + size / 2, startY + size / 2, x4, y4, size / 2, solution);
+      } else if (x === x3 && y === y3) {
+        cons = cons.slice(0, 2).concat(cons.slice(3));
+        solution.push(cons);
+        solution = solve(startX, startY, x1, y1, size / 2, solution);
+        solution = solve(x2, startY, x2, y2, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x3, y3, size / 2, solution);
+        solution = solve(startX + size / 2, startY + size / 2, x4, y4, size /2, solution);
+      } else if (x === x4 && y === y4) {
+        cons = cons.slice(0, 3);
+        solution.push(cons);
+        solution = solve(startX, startY, x1, y1, size / 2, solution);
+        solution = solve(x2, startY, x2, y2, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x3, y3, size / 2, solution);
+        solution = solve(startX + size / 2, startY + size / 2, x4, y4, size / 2, solution);
+      } else if (x <= x1 && y <= y1) {
+        cons = cons.slice(1);
+        solution.push(cons);
+        solution = solve(startX, startY, x, y, size / 2, solution);
+        solution = solve(x2, startY, x2, y2, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x3, y3, size / 2, solution);
+        solution = solve(startX + size / 2, startY + size / 2, x4, y4, size / 2, solution);
+      } else if(x >= x2 && y <= y2) {
+        cons = cons.slice(0, 1).concat(cons.slice(2));
+        solution.push(cons);
+        solution = solve(startX, startY, x1, y1, size / 2, solution);
+        solution = solve(x2, startY, x, y, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x3, y3, size /2 , solution);
+        solution = solve(startX + size / 2, startY + size / 2, x4, y4, size / 2, solution);
+      } else if (x <= x3 && y >= y3) {
+        cons = cons.slice(0, 2).concat(cons.slice(3));
+        solution.push(cons);
+        solution = solve(startX, startY, x1, y1, size / 2, solution);
+        solution = solve(x2, startY, x2, y2, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x, y, size / 2, solution);
+        solution = solve(startX + size / 2, startY + size / 2, x4, y4, size / 2, solution);
+      } else {
+        cons = cons.slice(0, 3);
+        solution.push(cons);
+        solution = solve(startX, startY, x1, y1, size / 2, solution);
+        solution = solve(x2, startY, x2, y2, size / 2, solution);
+        solution = solve(startX, startY + size / 2, x3, y3, size /2 , solution);
+        solution = solve(startX + size / 2, startY + size / 2, x, y, size / 2, solution);
+      }
+      return solution;
+    }
+
+    function findCenter(step) {
+      for (var i = 0; i < step.length; i++) {
+        var point = step[i];
+        var center = true;
+        for(var j = 0; j < step.length; j++) if (j !== i) {
+          var p2 = step[j];
+          if ((point.x - p2.x) * (point.y - p2.y)) center = false;
+        }
+        if (center) {
+          return point;
+        }
+      }
+      return {};
+    }
+
+    var ca = document.getElementById("container1");
+    var solCtx = ca.getContext("2d");
+    function drawSolution(solution) {
+      var startX = 20.5, startY = 20.5;
+      var width = 20, height = 20;
+      var direction = [ [1, 0], [0, 1], [-1, 0], [0, -1]];
+      solCtx.drawImage(canvas, 0, 0);
+      solCtx.strokeStyle = "blue";
+      solCtx.lineWidth = 1;
+      solCtx.beginPath();
+
+      for(var i = 0; i < solution.length; i++) {
+        var center = findCenter(solution[i]);
+        console.log(center);
+        solCtx.moveTo(startX + center.x * width, startY + center.y * height);
+        for(var j = 0; j < 3; j++) {
+          for(var k = 0; k < 4; k++) {
+            if (center.x + direction[k][0] === solution[i][j].x && center.y + direction[k][1] === solution[i][j].y) {
+              console.log("in the line to");
+              solCtx.lineTo(solution[i][j].x * width + startX, solution[i][j].y * height + startY);
+              solCtx.moveTo(startX + center.x * width, startY + center.y * height);
+            }
+          }
+        }
+      }
+      solCtx.stroke();
+    }
+    drawBoard(2, 0, 0);
+    generateBtn.addEventListener("click", function () {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      xPos = +xInput.value;
+      yPos = +yInput.value;
+      drawBoard(input.value, xPos, yPos);
+    });
+    solveBtn.addEventListener("click", function () {
+      const size = +input.value;
+      var sol = solve(0, 0, xPos, yPos, size, []);
+      solCtx.clearRect(0, 0, canvas.width, canvas.height);
+      drawSolution(sol);
+    })
+  </script>
+
+</body>
+</html>

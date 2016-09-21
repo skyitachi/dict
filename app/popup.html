@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!-- build:css styles/popup-vendor.css -->
+    <!-- bower:css -->
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css styles/main.css -->
+    <link href="https://cdn.muicss.com/mui-0.7.5/css/mui.min.css" rel="stylesheet" type="text/css" />
+    <link href="styles/main.css" rel="stylesheet">
+
+    <!-- endbuild -->
+  </head>
+  <body class="body">
+  <!--<img src="images/logo.png" />-->
+  <form id="form" class="mui-form mui-form--inline">
+    <div class="mui-textfield">
+      <input id="word" type="text" autocomplete="off"/>
+    </div>
+    <button class="mui-btn mui-btn--flat mui-btn--primary" id="lookup">查询</button>
+  </form>
+  <div id="result"></div>
+  <form id="form-option">
+    <div class="mui-checkbox">
+      <label><input type="checkbox" name="filter" value="true">该页面启用划词翻译</label>
+    </div>
+  </form>
+
+    <!-- build:js scripts/popup-vendor.js -->
+    <!-- bower:js -->
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js scripts/popup.js -->
+    <script src="scripts/jquery-3.1.0.min.js"></script>
+    <script src="scripts/popup.js"></script>
+    <!-- endbuild -->
+  </body>
+</html>
