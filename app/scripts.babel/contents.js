@@ -27,15 +27,13 @@ function main() {
     document.body.addEventListener("mouseup", function () {
       if (selectionStart) {
         const selection = window.getSelection();
-        const word = selection.toString();
-        const isNormalWord = isNormal(word);
+        const word = selection.toString().trim();
+        const isEnglish = isBasicLatin(word);
         chrome.storage.sync.set({ "lastWord": word });
-        if (enableAutoTranslate && isNormalWord) {
+        if ((enableAutoTranslate && !word) || isEnglish) {
           findPosition(selection, word);
           lookup(word);
-        }
-        // 隐藏
-        if (!isNormalWord || !enableAutoTranslate) {
+        } else {
           document.getElementById(POPUP).style.display = "none";
         }
       }
@@ -197,7 +195,7 @@ function findPosition(selection, word = "") {
   const computedStyle = window.getComputedStyle(parentElement);
   const container = document.getElementById(POPUP);
   const txtWidth = get_text_width("a", computedStyle.font);
-  container.style.top = `${scrollTop + rangeRect.top + parseInt(computedStyle.lineHeight)}px`;
+  container.style.top = `${scrollTop + rangeRect.top + rangeRect.height}px`;
   // left 仍然以屏幕为基准取位置
   let left = scrollLeft + rangeRect.left + word.length * txtWidth;
   if (left + WIDTH + 10 > document.body.offsetWidth) {
@@ -218,7 +216,7 @@ function contentTpl(res/* look up result */) {
   `;
 }
 
-function isNormal(word) {
-  const blackList = String.fromCharCode(10/* enter */, 32/* 空格 */, 9/* tab */);
-  return blackList.indexOf(word) === -1 ? !!word : false;
+function isBasicLatin(word = "") {
+  const re = /[^\u0000-\u007f]/;
+  return !re.test(word);
 }
