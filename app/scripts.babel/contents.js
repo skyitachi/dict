@@ -28,9 +28,9 @@ function main() {
       if (selectionStart) {
         const selection = window.getSelection();
         const word = selection.toString().trim();
-        const isEnglish = isBasicLatin(word);
+        const canAutoLookup = isNormalEnglishWord(word);
         chrome.storage.sync.set({ "lastWord": word });
-        if ((enableAutoTranslate && !word) || isEnglish) {
+        if ((enableAutoTranslate && !word) || canAutoLookup) {
           findPosition(selection, word);
           lookup(word);
         } else {
@@ -219,4 +219,11 @@ function contentTpl(res/* look up result */) {
 function isBasicLatin(word = "") {
   const re = /[^\u0000-\u007f]/;
   return !re.test(word);
+}
+
+// 英文句子暂时不自动翻译
+function isNormalEnglishWord(words) {
+  const list = words.split(/\s+/);
+  if (list.length > 2)  return false;
+  return list.every(isBasicLatin);
 }
