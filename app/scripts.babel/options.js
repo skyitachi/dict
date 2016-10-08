@@ -1,8 +1,4 @@
 /**
- * Created by 秘银<shiping.ysp@alibaba-inc.com> on 16/9/10.
- */
-
-/**
  * @author Dongxu Huang
  * @date   2010-2-21
  */

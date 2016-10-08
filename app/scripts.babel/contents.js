@@ -1,6 +1,3 @@
-/**
- * Created by 秘银<shiping.ysp@alibaba-inc.com> on 16/9/3.
- */
 const MESSAGE_AUTO_LOOKUP = "AUTO_LOOKUP";
 const TRANSLATE_WORD = "translate_word";
 const POPUP_CONTENT_ID = "youdao-popup-content";
