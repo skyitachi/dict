@@ -25,9 +25,8 @@ function main() {
       if (selectionStart) {
         const selection = window.getSelection();
         const word = selection.toString().trim();
-        const canAutoLookup = isNormalEnglishWord(word);
         chrome.storage.sync.set({ "lastWord": word });
-        if ((enableAutoTranslate && !word) || canAutoLookup) {
+        if (enableAutoTranslate && !word) {
           findPosition(selection, word);
           lookup(word);
         } else {
