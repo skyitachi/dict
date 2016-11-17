@@ -1,4 +1,5 @@
 #youdao-popup {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   position: absolute;
   display: none;
   z-index: 100;
@@ -12,6 +13,7 @@
 }
 #youdao-popup-header {
   overflow: hidden;
+  position: relative;
   zoom: 1;
   color: #fff;
   height: 28px;
@@ -37,8 +39,19 @@
 #youdao-popup-content {
   padding: 10px;
   font-size: 14px;
+  line-height: 16px;
 }
 
 #youdao-popup .category-title {
-  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 16px;
+  margin: 5px 0;
+}
+#youdao-popup .interpretation {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
 }

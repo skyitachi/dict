@@ -206,9 +206,9 @@ function contentTpl(res/* look up result */) {
   }
   return `
     <h5 class="category-title">${res.baseTitle}:</h5>
-    <div>${res.baseTemplate}</div>
+    <div class="interpretation">${res.baseTemplate}</div>
     <h5 class="category-title">${res.webTitle}:</h5>
-    <div>${res.webTemplate}</div>
+    <div class="interpretation">${res.webTemplate}</div>
   `;
 }
 

@@ -142,24 +142,24 @@ function translateXML(xmlNode) {
     template = emptyTemplate;
   } else if (baseEmpty) {
     template = `
-      <h5>${title}:<h5>
-      ${emptyTemplate}
-      <h5>${webTitle}:</h5>
-      ${webTrans}
+      <h5 class="category-title">${title}:</h5>
+      <div class="interpretation"> ${emptyTemplate}</div>
+      <h5 class="category-title">${webTitle}:</h5>
+      <div class="interpretation">${webTrans}</div>
     `
   } else if (webEmpty) {
     template = `
-      <h5>${title}:<h5>
-      ${baseTrans}
-      <h5>${webTitle}:</h5>
-      ${emptyTemplate}
+      <h5 class="category-title">${title}:</h5>
+      <div class="interpretation">${baseTrans}</div>
+      <h5 class="category-title">${webTitle}:</h5>
+      <div class="interpretation"> ${emptyTemplate}</div>
     `;
   } else {
     template = `
-    <h5>英汉释义<h5>
-    ${baseTrans}
-    <h5>网络释义<h5>
-    ${webTrans}
+    <h5 class="category-title">英汉释义</h5>
+    <div class="interpretation">${baseTrans}</div>
+    <h5 class="category-title">网络释义<h5>
+    <div class="interpretation">${webTrans}</div>
   `;
   }
   return template;
