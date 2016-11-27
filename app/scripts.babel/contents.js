@@ -21,7 +21,12 @@ function main() {
     document.body.addEventListener("mousedown", function () {
       selectionStart = true;
     });
-    document.body.addEventListener("mouseup", function () {
+    document.body.addEventListener("mouseup", function (event) {
+      // click on close button will enable mouseup event
+      const closeElement = document.getElementById(POPUP_CLOSE_ID);
+      if (event.target === closeElement) {
+        return;
+      }
       if (selectionStart) {
         const selection = window.getSelection();
         const word = selection.toString().trim();
@@ -164,12 +169,14 @@ function renderContentWrapper() {
   container.id = POPUP;
   container.className = POPUP;
   container.innerHTML = template;
+  container.draggable = true;
+  // set drag event
+  setupDragEvent(container);
   document.body.appendChild(container);
   const closeElement = document.getElementById(POPUP_CLOSE_ID);
-  const body = document.getElementById(POPUP);
-  if (closeElement && body) {
-    closeElement.addEventListener("click", function () {
-      body.style.display = "none";
+  if (closeElement && container) {
+    closeElement.addEventListener("click", function (event) {
+      container.style.display = "none";
     });
   }
 }
@@ -222,4 +229,13 @@ function isNormalEnglishWord(words) {
   const list = words.split(/\s+/);
   if (list.length > 2)  return false;
   return list.every(isBasicLatin);
+}
+
+function setupDragEvent(element) {
+  element.addEventListener("dragend", function (event) {
+    const target = event.target;
+    const height = target.offsetHeight;
+    element.style.left = `${event.screenX}px`;
+    element.style.top = `${Math.max(event.screenY - height, 0)}px`;
+  });
 }

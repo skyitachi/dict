@@ -13,13 +13,13 @@ function main() {
     e.preventDefault();
   });
   $("#lookup").on("click", function () {
-    var word = $("#word").val();
+    const word = $("#word").val();
     lookup(word);
   });
   $(document.body).on("keydown", function (e) {
     // enter键查询
     if (e.which === 13) {
-      var word = $("#word").val();
+      const word = $("#word").val();
       lookup(word);
     }
   });
@@ -41,7 +41,7 @@ function sendMessage(message) {
 }
 
 function getFormObj(form) {
-  var serializeArray = $(form).serializeArray();
+  const serializeArray = $(form).serializeArray();
   return serializeArray.reduce((ret, item) => {
     ret[item.name] = item.value;
     return ret;
