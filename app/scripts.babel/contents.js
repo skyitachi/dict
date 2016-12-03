@@ -235,7 +235,8 @@ function setupDragEvent(element) {
   element.addEventListener("dragend", function (event) {
     const target = event.target;
     const height = target.offsetHeight;
-    element.style.left = `${event.screenX}px`;
-    element.style.top = `${Math.max(event.screenY - height, 0)}px`;
+    const scrollTop = document.body.scrollTop;
+    element.style.left = `${Math.max(event.clientX, 0)}px`;
+    element.style.top = `${Math.max(event.clientY - height + scrollTop, 0)}px`;
   });
 }
