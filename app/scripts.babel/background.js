@@ -4,8 +4,6 @@ chrome.runtime.onInstalled.addListener(details => {
   console.log("previousVersion", details.previousVersion);
 });
 
-chrome.browserAction.setBadgeText({text: "YouDao"});
-
 chrome.runtime.onMessage.addListener(
   function (response, sender, sendResponse) {
     if (response && response.type === MESSAGE_AUTO_LOOKUP) {
