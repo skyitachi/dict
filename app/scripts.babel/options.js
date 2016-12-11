@@ -101,7 +101,7 @@ function translateXML(xmlnode){
 
   if (""+ root.getElementsByTagName("translation")[0] == "undefined")
   {
-    noBaseTrans = true;
+    noBaseTrans = true
   }
   if (""+ root.getElementsByTagName("web-translation")[0] == "undefined")
   {

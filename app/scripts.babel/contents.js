@@ -3,13 +3,15 @@ const TRANSLATE_WORD = "translate_word";
 const POPUP_CONTENT_ID = "youdao-popup-content";
 const POPUP_CLOSE_ID = "youdao-popup-close";
 const POPUP = "youdao-popup";
+const VOICE_IMG = "youdao-voice-img";
 const POPUP_HEADER = "youdao-popup-header";
 const POPUP_TITLE = "youdao-popup-title";
 const WIDTH = 300; // popup content width
 
 let selectionStart = false;
 let enableAutoTranslate = false; // 是否启用划词翻译
-
+let currentWord = "";
+const audioContext = new AudioContext();
 main();
 
 function main() {
@@ -24,12 +26,12 @@ function main() {
     document.body.addEventListener("mouseup", function (event) {
       // click on close button will enable mouseup event
       const closeElement = document.getElementById(POPUP_CLOSE_ID);
-      if (event.target === closeElement) {
-        return;
-      }
+      if (event.target === closeElement) return;
       if (selectionStart) {
         const selection = window.getSelection();
         const word = selection.toString().trim();
+        if (isSentence(word)) return;
+        currentWord = word;
         chrome.storage.sync.set({ "lastWord": word });
         if (enableAutoTranslate && word) {
           findPosition(selection, word);
@@ -140,6 +142,12 @@ function getUrl(word) {
   return `${protocol}//dict.youdao.com/fsearch?client=deskdict&keyfrom=chrome.extension&q=${encodeURIComponent(word)}&pos=-1&doctype=xml&xmlVersion=3.2&dogVersion=1.0&vendor=unknown&appVer=3.1.17.4208&le=eng`
 }
 
+function getAudioUrl(word) {
+  const protocol = window.location.protocol;
+  // US
+  return `${protocol}//dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
+}
+
 function renderPopup(template, word) {
   const container = document.getElementById(POPUP);
   const content = document.getElementById(POPUP_CONTENT_ID);
@@ -158,9 +166,11 @@ function isEmpty(object) {
 }
 
 function renderContentWrapper() {
+  const pngSrc = chrome.extension.getURL("images/megaphone.png");
   const template = `
     <div id="${POPUP_HEADER}">
       <span id="${POPUP_TITLE}"></span>
+      <img src="${pngSrc}" id="${VOICE_IMG}" />
       <span id="${POPUP_CLOSE_ID}">X</span>
     </div>
     <div id="${POPUP_CONTENT_ID}"></div>
@@ -174,9 +184,35 @@ function renderContentWrapper() {
   setupDragEvent(container);
   document.body.appendChild(container);
   const closeElement = document.getElementById(POPUP_CLOSE_ID);
+  const voiceElement = document.getElementById(VOICE_IMG);
   if (closeElement && container) {
-    closeElement.addEventListener("click", function (event) {
+    closeElement.addEventListener("click", function () {
       container.style.display = "none";
+    });
+  }
+
+  if (voiceElement) {
+    voiceElement.addEventListener("click", function () {
+      const url = getAudioUrl(currentWord);
+      const audio = document.getElementById(POPUP_AUDIO);
+      if (audio) {
+        fetch(url)
+          .then(res => {
+            return res.arrayBuffer();
+          })
+          .then(arrBuf => {
+            return audioContext.decodeAudioData(arrBuf);
+          })
+          .then(audioBuf => {
+            const source = audioContext.createBufferSource();
+            source.buffer = audioBuf;
+            source.connect(audioContext.destination);
+            source.start(0);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
     });
   }
 }
@@ -229,6 +265,11 @@ function isNormalEnglishWord(words) {
   const list = words.split(/\s+/);
   if (list.length > 2)  return false;
   return list.every(isBasicLatin);
+}
+
+// 句子暂时不翻译
+function isSentence(words = "") {
+  return words.split(/\s+/).length >= 4;
 }
 
 function setupDragEvent(element) {

@@ -54,6 +54,7 @@
     "default_popup": "popup.html"
   },
   "web_accessible_resources": [
-    "images/logo-32.png"
+    "images/logo-32.png",
+    "images/megaphone.png"
   ]
 }

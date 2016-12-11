@@ -28,6 +28,7 @@
 #youdao-popup-title {
   margin-left: 10px;
   font-size: 14px;
+  line-height: 28px;
   color: #fff;
 }
 
@@ -58,3 +59,11 @@
   font-size: 14px;
   line-height: 16px;
 }
+#youdao-popup #youdao-voice-img {
+  margin-left: 5px;
+  height: 20px;
+  line-height: 28px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
