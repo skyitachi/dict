@@ -32,7 +32,7 @@ function main() {
         const word = selection.toString().trim();
         if (isSentence(word)) return;
         currentWord = word;
-        chrome.storage.sync.set({ "lastWord": word });
+        chrome.storage.sync.set({"lastWord": word});
         if (enableAutoTranslate && word) {
           findPosition(selection, word);
           lookup(word);
@@ -118,23 +118,23 @@ function lookup(word) {
   if (!word) return;
   const url = getUrl(word);
   fetch(url)
-    .then(res => {
-      if (res.status === 200) {
-        return res.text();
-      } else {
-        return Promise.reject(new Error(res.status))
-      }
-    })
-    .then(body => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(body, "application/xml");
-      const translated = translateXML(doc);
-      renderPopup(translated, word);
-    })
-    .catch(e => {
-      console.log(e.message, e.stack);
-      renderPopup("<h4>暂未找到释义</h4>");
-    });
+  .then(res => {
+    if (res.status === 200) {
+      return res.text();
+    } else {
+      return Promise.reject(new Error(res.status))
+    }
+  })
+  .then(body => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(body, "application/xml");
+    const translated = translateXML(doc);
+    renderPopup(translated, word);
+  })
+  .catch(e => {
+    console.log(e.message, e.stack);
+    renderPopup("<h4>暂未找到释义</h4>");
+  });
 }
 
 function getUrl(word) {
@@ -194,25 +194,22 @@ function renderContentWrapper() {
   if (voiceElement) {
     voiceElement.addEventListener("click", function () {
       const url = getAudioUrl(currentWord);
-      const audio = document.getElementById(POPUP_AUDIO);
-      if (audio) {
-        fetch(url)
-          .then(res => {
-            return res.arrayBuffer();
-          })
-          .then(arrBuf => {
-            return audioContext.decodeAudioData(arrBuf);
-          })
-          .then(audioBuf => {
-            const source = audioContext.createBufferSource();
-            source.buffer = audioBuf;
-            source.connect(audioContext.destination);
-            source.start(0);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }
+      fetch(url)
+      .then(res => {
+        return res.arrayBuffer();
+      })
+      .then(arrBuf => {
+        return audioContext.decodeAudioData(arrBuf);
+      })
+      .then(audioBuf => {
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuf;
+        source.connect(audioContext.destination);
+        source.start(0);
+      })
+      .catch(error => {
+        console.log(error);
+      });
     });
   }
 }
