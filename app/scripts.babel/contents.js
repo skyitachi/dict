@@ -42,6 +42,34 @@ function main() {
       }
       selectionStart = false;
     });
+    document.body.addEventListener("keyup", function (event) {
+      // ctrl+shift+e, enable auto lookup
+      if (event.key === "E" && event.ctrlKey && event.shiftKey) {
+        enableAutoTranslate = true;
+        sendMessage({ type: MESSAGE_AUTO_LOOKUP, data: true });
+        // store filter
+        chrome.storage.sync.get(["filter"], function (items) {
+          const url = location.href;
+          const currentFilter = items.filter || [];
+          if (currentFilter.indexOf(url) === -1) {
+            chrome.storage.sync.set({ filter: currentFilter.concat([url])});
+          }
+        });
+      }
+      // ctrl+shift+u, disable auto lookup
+      if (event.key === "U" && event.ctrlKey && event.shiftKey) {
+        enableAutoTranslate = false;
+        // remove filter
+        chrome.storage.sync.get(["filter"], function (items) {
+          const url = location.href;
+          const currentFilter = items.filter || [];
+          const idx = currentFilter.indexOf(url);
+          if (idx !== -1) {
+            chrome.storage.sync.set({ filter: currentFilter.slice(0, idx).concat(currentFilter.slice(idx + 1))});
+          }
+        });
+      }
+    });
   });
   chrome.runtime.onMessage.addListener(function (response, sender, sendResponse) {
     if (response && response.type === MESSAGE_AUTO_LOOKUP) {
@@ -52,7 +80,7 @@ function main() {
 
 function sendMessage(message) {
   chrome.runtime.sendMessage(message, function (response) {
-    console.log("response is: ", response);
+    // console.log("response is: ", response);
   });
 }
 

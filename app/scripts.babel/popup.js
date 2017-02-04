@@ -25,7 +25,6 @@ function main() {
   });
   $("#form-option").on("change", function () {
     const formData = getFormObj(this);
-    console.log(formData);
     sendMessage({
       type: MESSAGE_AUTO_LOOKUP,
       data: Boolean(formData.filter)
@@ -36,7 +35,7 @@ function main() {
 
 function sendMessage(message) {
   chrome.runtime.sendMessage(message, function (response) {
-    console.log("response is: ", response);
+    // console.log("response is: ", response);
   });
 }
 
